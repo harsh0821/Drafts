@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meraki — Menu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#1C3829;
+    --forest-deep:#13261C;
+    --cream:#F2EAD3;
+    --gold:#C9A84C;
+    --ink:#14110F;
+    --muted:#8E8473;
+    --line: rgba(20,17,15,0.08);
+    --line-dark: rgba(242,234,211,0.12);
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{ background:var(--cream); color:var(--ink); font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased; }
+  .display{ font-family:'Anton',sans-serif; text-transform:uppercase; letter-spacing:0.01em; font-weight:400; }
+
+  .hero{ background:linear-gradient(180deg,var(--ink) 0%,var(--forest-deep) 100%); color:var(--cream); padding:56px 24px 64px; text-align:center; }
+  .hero__nav{ display:flex; justify-content:space-between; align-items:center; max-width:1200px; margin:0 auto 64px; font-size:0.78rem; letter-spacing:0.18em; font-weight:600; }
+  .hero__nav .wordmark{ font-family:'Anton',sans-serif; font-size:1.1rem; letter-spacing:0.12em; }
+  .hero__nav a{ color:var(--cream); text-decoration:none; opacity:0.65; margin-left:32px; transition:opacity .2s; }
+  .hero__nav a:hover{ opacity:1; }
+  .hero__nav .links{ display:flex; }
+  .hero h1{ font-size:clamp(3rem,11vw,7.5rem); line-height:0.98; }
+  .hero p{ margin-top:24px; font-size:0.8rem; letter-spacing:0.24em; color:#C9C2AE; text-transform:uppercase; }
+
+  .tabs{ position:sticky; top:0; z-index:50; background:var(--cream); border-bottom:1px solid var(--ink); }
+  .tabs__inner{ max-width:1200px; margin:0 auto; display:flex; justify-content:center; gap:8px; padding:18px 24px; }
+  .tab{ font-family:'Anton',sans-serif; text-transform:uppercase; letter-spacing:0.06em; font-size:clamp(0.95rem,2.4vw,1.3rem); background:none; border:none; color:var(--muted); cursor:pointer; padding:8px 18px; border-radius:999px; transition:all .2s; }
+  .tab.active{ color:var(--cream); background:var(--forest); }
+  .tab:hover:not(.active){ color:var(--ink); }
+
+  .jumpnav{ max-width:1200px; margin:0 auto; padding:28px 24px 0; display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+  .jumpnav a{ font-size:0.74rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--forest); text-decoration:none; border:1px solid var(--line); border-radius:999px; padding:8px 16px; transition:all .2s; white-space:nowrap; }
+  .jumpnav a:hover{ border-color:var(--forest); background:var(--forest); color:var(--cream); }
+
+  .panel{ display:none; }
+  .panel.active{ display:block; }
+
+  .section{ padding:88px 24px 0; }
+  .section__head{ max-width:1200px; margin:0 auto 56px; text-align:center; }
+  .section__head .eyebrow{ font-size:0.72rem; letter-spacing:0.32em; color:var(--forest); margin-bottom:14px; opacity:0.6; }
+  .section__head h2{ font-size:clamp(2.4rem,7vw,4.4rem); }
+  .section__head p{ margin-top:14px; font-size:0.92rem; color:var(--muted); letter-spacing:0.02em; }
+  .section--last{ padding-bottom:100px; }
+
+  .category-list{ max-width:1200px; margin:0 auto; padding:0 24px; }
+  .category{ margin-bottom:64px; scroll-margin-top:90px; }
+  .category:last-child{ margin-bottom:0; }
+  .category__title{ font-size:clamp(1.6rem,4.2vw,2.4rem); margin-bottom:20px; padding-bottom:18px; border-bottom:1px solid var(--ink); }
+
+  .items{ display:grid; grid-template-columns:1fr 1fr; gap:0 64px; }
+  .items--single{ grid-template-columns:1fr; max-width:760px; }
+
+  .item{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; padding:12px 0; }
+  .item__main{ display:flex; flex-direction:column; gap:4px; }
+  .item__name{ font-weight:600; font-size:0.96rem; letter-spacing:0.01em; }
+  .item__desc{ font-size:0.8rem; color:var(--muted); line-height:1.5; max-width:42ch; }
+  .item__price{ font-weight:700; color:var(--forest); font-size:0.96rem; white-space:nowrap; font-variant-numeric:tabular-nums; padding-top:1px; }
+  .item__price small{ font-weight:500; font-size:0.72rem; color:var(--muted); }
+
+  .item--spirit{ flex-direction:column; align-items:stretch; gap:6px; padding:18px 0; border-bottom:1px solid var(--line); }
+  .item--spirit:last-child{ border-bottom:none; }
+  .item--spirit .row1{ display:flex; justify-content:space-between; align-items:baseline; }
+  .item--spirit .item__name{ font-size:1.02rem; }
+  .item--spirit .origin{ font-size:0.74rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.12em; }
+  .item--spirit .prices{ display:flex; gap:32px; font-weight:700; color:var(--forest); font-size:0.96rem; font-variant-numeric:tabular-nums; }
+  .item--spirit .prices span{ display:flex; flex-direction:column; align-items:flex-end; min-width:54px; }
+  .item--spirit .prices span small{ font-weight:500; font-size:0.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-top:2px; }
+
+  .photo-moment{ margin-top:88px; height:60vh; min-height:380px; max-height:600px; background-size:cover; background-position:center; position:relative; display:flex; align-items:flex-end; }
+  .photo-moment::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(20,17,15,0) 40%,rgba(20,17,15,0.75) 100%); }
+  .photo-moment__label{ position:relative; z-index:1; padding:0 32px 48px; color:var(--cream); }
+  .photo-moment__label .eyebrow{ font-size:0.75rem; letter-spacing:0.3em; color:var(--gold); margin-bottom:10px; text-transform:uppercase; }
+  .photo-moment__label h2{ font-size:clamp(2.6rem,9vw,5.5rem); line-height:1; }
+
+  footer{ background:var(--ink); color:var(--cream); padding:80px 24px 0; }
+  .footer-grid{ max-width:1200px; margin:0 auto; display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:40px; padding-bottom:56px; border-bottom:1px solid var(--line-dark); }
+  .footer-grid h4{ font-size:0.72rem; letter-spacing:0.25em; color:var(--gold); margin-bottom:16px; text-transform:uppercase; }
+  .footer-grid p, .footer-grid a{ color:var(--cream); text-decoration:none; font-size:0.92rem; line-height:1.8; display:block; opacity:0.85; }
+  .footer-wordmark{ font-family:'Anton',sans-serif; text-transform:uppercase; font-size:clamp(3.5rem,19vw,10rem); letter-spacing:0.02em; text-align:center; padding:28px 0 18px; color:var(--cream); }
+  .footer-wordmark .mark{ color:var(--gold); font-size:0.3em; vertical-align:top; margin-left:10px; }
+  .footer-note{ text-align:center; font-size:0.75rem; color:#8E8473; padding-bottom:28px; letter-spacing:0.08em; }
+  .legal-note{ max-width:1200px; margin:0 auto; padding:32px 24px; text-align:center; font-size:0.75rem; color:var(--muted); letter-spacing:0.04em; line-height:1.8; border-top:1px solid var(--line); }
+  .legal-note .keys{ margin-top:10px; display:flex; gap:24px; justify-content:center; flex-wrap:wrap; font-size:0.72rem; }
+  .legal-note .keys span{ display:flex; align-items:center; gap:6px; }
+  .dot{ width:10px; height:10px; border-radius:2px; display:inline-block; }
+  .dot--veg{ background:#3F8C4B; }
+  .dot--nonveg{ background:#C0392B; }
+
+  @media(max-width:760px){
+    .hero{ padding:32px 20px 48px; }
+    .hero__nav{ margin-bottom:48px; }
+    .hero__nav .links a{ margin-left:18px; }
+    .tabs__inner{ padding:14px 16px; gap:6px; }
+    .tab{ padding:8px 14px; }
+    .jumpnav{ padding:20px 16px 0; gap:8px; }
+    .jumpnav a{ padding:7px 13px; font-size:0.7rem; }
+    .section{ padding:56px 16px 0; }
+    .section__head{ margin-bottom:36px; }
+    .category-list{ padding:0 16px; }
+    .category{ margin-bottom:48px; }
+    .items{ grid-template-columns:1fr; gap:0; }
+    .item{ padding:12px 0; border-bottom:1px solid var(--line); }
+    .item:last-child{ border-bottom:none; }
+    .photo-moment{ margin-top:56px; height:50vh; }
+    .footer-grid{ grid-template-columns:1fr; gap:32px; }
+    .item--spirit .row1{ flex-direction:column; align-items:flex-start; gap:4px; }
+    .item--spirit .prices{ gap:20px; margin-top:8px; flex-wrap:wrap; }
+  }
+  a:focus-visible,.tab:focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <nav class="hero__nav">
+    <span class="wordmark">Meraki</span>
+    <div class="links">
+      <a href="#">Home</a>
+      <a href="#">About</a>
+      <a href="#">Gallery</a>
+      <a href="#">Reserve</a>
+    </div>
+  </nav>
+  <h1 class="display">The Menu</h1>
+  <p>Food &middot; Bar &middot; Mocktails &amp; Beverages</p>
+</header>
+
+<div class="tabs">
+  <div class="tabs__inner">
+    <button class="tab active" data-tab="food">Food</button>
+    <button class="tab" data-tab="bar">Bar</button>
+    <button class="tab" data-tab="drinks">Drinks</button>
+  </div>
+</div>
+
+<!-- ===== FOOD PANEL ===== -->
+<div class="panel active" id="panel-food">
+  <section class="section">
+    <div class="section__head">
+      <div class="eyebrow">Section One</div>
+      <h2 class="display">Food Menu</h2>
+      <p>Small plates, sharing platters, and signature mains.</p>
+    </div>
+    <nav class="jumpnav">
+      <a href="#soup">Soup</a>
+      <a href="#salad">Salad</a>
+      <a href="#bar-nibbles">Bar Nibbles</a>
+      <a href="#veg-app">Veg Appetizers</a>
+      <a href="#meat-app">Meat Lovers</a>
+      <a href="#platters">Sharing Platters</a>
+      <a href="#momos">Dimsum &amp; Momos</a>
+      <a href="#pasta">Pasta</a>
+      <a href="#pizza">Pizzas</a>
+      <a href="#veg-main">Veg Mains</a>
+      <a href="#meat-main">Meat Mains</a>
+      <a href="#chinatown">China Town</a>
+      <a href="#sides">Side Dishes</a>
+      <a href="#biryani">Biryani</a>
+      <a href="#combo">Combo Meals</a>
+      <a href="#dessert">Dessert</a>
+    </nav>
+    <div class="category-list" style="margin-top:64px;">
+
+      <div class="category" id="soup">
+        <h3 class="category__title display">Soup</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Hot &amp; Sour Soup</span></div><div class="item__price">195 <small>/ 245</small></div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Cream of Mushroom</span></div><div class="item__price">225</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Tomato &amp; Basil Soup</span></div><div class="item__price">225</div></div>
+        </div>
+      </div>
+
+      <div class="category" id="salad">
+        <h3 class="category__title display">Salad</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Green Salad</span><span class="item__desc">Sliced onion, tomato, carrot, cucumber, chilli &amp; lemon</span></div><div class="item__price">195</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Caesar Salad</span><span class="item__desc">Iceberg lettuce, caesar dressing, olives, croutons. Veg or chicken</span></div><div class="item__price">245 <small>/ 275</small></div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Roasted Chicken Salad</span><span class="item__desc">Iceberg lettuce, lemon vinaigrette, bell peppers</span></div><div class="item__price">275</div></div>
+        </div>
+      </div>
+
+      <div class="category" id="bar-nibbles">
+        <h3 class="category__title display">Bar Nibbles</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Nachos &amp; Salsa</span><span class="item__desc">Fried tortilla chips with tomato salsa</span></div><div class="item__price">245</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Masala Peanut</span><span class="item__desc">Groundnut, onion, tomato, green chilli, coriander</span></div><div class="item__price">245</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Roasted Masala Papad</span><span class="item__desc">Spicy roasted papadam, onion, tomato &amp; chilli</span></div><div class="item__price">245</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">French Fries</span><span class="item__desc">Salted / Peri-Peri</span></div><div class="item__price">245</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Potato Wedges</span><span class="item__desc">Baby potato wedges, fried &amp; spiced</span></div><div class="item__price">245</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Garlic Bread / Cheese Garlic Bread</span></div><div class="item__price">225 <small>/ 275</small></div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Mini Samosa</span><span class="item__desc">Aloo &amp; cottage cheese, fried</span></div><div class="item__price">225</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Chakhna Platter</span><span class="item__desc">Masala peanut, nachos, peri-peri wedges, makhana</span></div><div class="item__price">345</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Collage of Nuggets Veg</span><span class="item__desc">Jalapeno poppers, peri-peri fries, potato wedges, mini samosa</span></div><div class="item__price">375</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Chicken Popcorn</span><span class="item__desc">Crumb battered chicken, peri-peri mayo</span></div><div class="item__price">275</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Peri Peri Chicken Nuggets</span><span class="item__desc">Peri-peri marinated chicken tikka, sambal mayo</span></div><div class="item__price">325</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Fish Koliwada</span><span class="item__desc">Sole fish, Maharashtrian spices</span></div><div class="item__price">425</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Keema Mirch Fritters</span><span class="item__desc">Minced mutton &amp; cheese stuffed chillies, desi chutney</span></div><div class="item__price">225</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Collage of Nuggets Chicken</span><span class="item__desc">Chicken nuggets, popcorn, keema fritters &amp; fish koliwada</span></div><div class="item__price">425</div></div>
+        </div>
+      </div>
+
+      <div class="category" id="veg-app">
+        <h3 class="category__title display">Vegetarian Appetizers</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Truffle Mushroom Cheese Kulcha</span><span class="item__desc">Kulcha stuffed with cheese &amp; mushroom, mint sauce</span></div><div class="item__price">345</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Baked Cheese Nachos</span><span class="item__desc">Baked tortilla chips, beans, cheese, salsa &amp; sour cream</span></div><div class="item__price">345 <small>/ 375</small></div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Cheese Cigar Roll</span><span class="item__desc">Corn &amp; cheese spring rolls, sweet chilli sauce</span></div><div class="item__price">325</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Crispy Corn Burnt Garlic</span><span class="item__desc">Chef's delicacy</span></div><div class="item__price">295</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Honey Chilli Potatoes</span><span class="item__desc">Sliced potatoes tossed in honey chilli sauce</span></div><div class="item__price">265</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Cheese Stuffed Beetroot Kebab</span><span class="item__desc">Beetroot, green chilli &amp; cheese stuffed kebab</span></div><div class="item__price">375</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Paneer Tikka</span><span class="item__desc">Cottage cheese, Indian spices, tandoor</span></div><div class="item__price">375</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Paneer 65</span><span class="item__desc">Deep fried paneer, curry leaves &amp; green chilli</span></div><div class="item__price">345</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Mushroom Galouti Kebab</span><span class="item__desc">Minced mushroom kebab, saffron parantha</span></div><div class="item__price">345</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Stuffed Dahi Ke Kebab</span><span class="item__desc">Hung curd, Indian spices, nuts &amp; cheese</span></div><div class="item__price">345</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Peshawari Paneer Tikka</span><span class="item__desc">Paneer marinated in Peshawari spices, tandoor</span></div><div class="item__price">375</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Malai Badam Broccoli</span><span class="item__desc">Broccoli marinated in cream, spices &amp; cheese</span></div><div class="item__price">425</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Makhan Malai Soya Chaap</span><span class="item__desc">Soya chaap stuffed with cheese &amp; nuts</span></div><div class="item__price">385</div></div>
+        </div>
+      </div>
+
+      <div class="category" id="meat-app">
+        <h3 class="category__title display">Meat Lovers</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Chilli Chicken</span><span class="item__desc">Fried &amp; tossed, Asian style</span></div><div class="item__price">375</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Chicken 65</span><span class="item__desc">Deep fried, curry leaves &amp; green chilli</span></div><div class="item__price">375</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Tandoori Chicken</span><span class="item__desc">Street style</span></div><div class="item__price">425</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Chicken Tikka</span><span class="item__desc">Marinated chicken thigh, Indian spices</span></div><div class="item__price">395</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Cilantro Chicken Tikka</span><span class="item__desc">A different style of chicken tikka</span></div><div class="item__price">395</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Drums of Heaven</span><span class="item__desc">Fried chicken lollipop, peppers &amp; Chinese sauces</span></div><div class="item__price">445</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Murg Nizami Bharwa Tangadi</span><span class="item__desc">Chef's delicacy</span></div><div class="item__price">475</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Bhatti Ka Murg</span><span class="item__desc">Chicken marinated with curd, cashew &amp; brown onion</span></div><div class="item__price">425</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Mutton Sheekh Kebab</span><span class="item__desc">Street style Indian delicacy</span></div><div class="item__price">525</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Keema Ghost Kulcha</span><span class="item__desc">Indian small kulcha stuffed with minced mutton</span></div><div class="item__price">475</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Mutton Galouti Kebab</span><span class="item__desc">North Indian Mughlai, saffron parantha</span></div><div class="item__price">495</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Tawa Mutton</span><span class="item__desc">Chef's delicacy, warqi parantha</span></div><div class="item__price">545</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Kasundi Fish Tikka</span><span class="item__desc">Riversole fish, kashundi mustard</span></div><div class="item__price">525</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Tempura Prawns</span><span class="item__desc">Tempura fried prawns, thai sweet chilli sauce</span></div><div class="item__price">575</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Tandoori Prawns</span><span class="item__desc">Marinated in Indian spices, cooked in tandoor</span></div><div class="item__price">555</div></div>
+        </div>
+      </div>
+
+      <div class="category" id="platters">
+        <h3 class="category__title display">Sharing Platters</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Veg Kebab Platter</span><span class="item__desc">Malai badam broccoli, paneer tikka, dahi ke kabab, mushroom galouti</span></div><div class="item__price">625</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Hummus Pita Platter</span><span class="item__desc">Hummus, peri-peri hummus, jalapeno hummus, arabic pickle, pita bread</span></div><div class="item__price">495</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Non Veg Kebab Platter</span><span class="item__desc">Chicken tikka, chicken seekh, bhatti ka murg, fish tikka</span></div><div class="item__price">695</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Meat Kebab Platter</span><span class="item__desc">Nizami tangadi, mutton galouti, tawa mutton, mutton seekh kebab</span></div><div class="item__price">795</div></div>
+        </div>
+      </div>
+
+      <div class="category" id="momos">
+        <h3 class="category__title display">Dimsum &amp; Momos</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Exotic Veg Dimsum</span><span class="item__desc">Crystal dimsums stuffed with exotic vegetables</span></div><div class="item__price">245</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Wild Mushroom Dumpling</span><span class="item__desc">Trio of mushroom dimsums</span></div><div class="item__price">325</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Spicy Chicken Cilantro Dimsum</span><span class="item__desc">Crystal dimsums with minced chicken &amp; cilantro</span></div><div class="item__price">275</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Street Style Momos Veg</span><span class="item__desc">Veg stuffed momos, tomato peanut sauce</span></div><div class="item__price">245</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Street Style Momos Chicken</span><span class="item__desc">Chicken stuffed momos, tomato peanut sauce</span></div><div class="item__price">275</div></div>
+        </div>
+      </div>
+
+      <div class="category" id="pasta">
+        <h3 class="category__title display">Make Your Own Pasta</h3>
+        <div class="items items--single">
+          <div class="item"><div class="item__main"><span class="item__name">Choice of Pasta</span><span class="item__desc">Penne / Fusilli / Spaghetti</span></div><div class="item__price"></div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Choice of Sauce</span><span class="item__desc">Arrabiata / Alfredo / Pesto / Mix</span></div><div class="item__price"></div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Add Ons</span><span class="item__desc">Vegetable / Chicken / Prawns</span></div><div class="item__price">425 <small>/ 445 / 475</small></div></div>
+        </div>
+      </div>
+
+      <div class="category" id="pizza">
+        <h3 class="category__title display">Pizzas</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Classic Margherita</span><span class="item__desc">Thin crust, mozzarella &amp; basil</span></div><div class="item__price">425</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Veg Exotic Pizza</span><span class="item__desc">Thin crust, mozzarella &amp; exotic vegetables</span></div><div class="item__price">445</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Spicy Paneer Pizza</span><span class="item__desc">Thin crust, mozzarella, paneer tikka &amp; peri-peri mayo</span></div><div class="item__price">445</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Mexican Delight Pizza</span><span class="item__desc">Thin crust, mozzarella, kidney beans, nachos &amp; bell peppers</span></div><div class="item__price">465</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Roasted Chicken Pizza</span><span class="item__desc">Thin crust, mozzarella, roasted chicken &amp; lettuce</span></div><div class="item__price">495</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Pepperoni Pizza</span><span class="item__desc">Thin crust, mozzarella &amp; chicken pepperoni</span></div><div class="item__price">525</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Half &amp; Half</span><span class="item__desc">Choose any two of your favourite toppings</span></div><div class="item__price">525</div></div>
+        </div>
+      </div>
+
+      <div class="category" id="veg-main">
+        <h3 class="category__title display">Main Course Vegetarian</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Mushroom Do Pyaza</span><span class="item__desc">Button mushrooms in cashew gravy, tomato &amp; onion masala</span></div><div class="item__price">425</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Dal Makhani</span><span class="item__desc">Chef's delicacy, simmered overnight</span></div><div class="item__price">445</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Dal Tadka</span><span class="item__desc">Classic yellow dal tadka</span></div><div class="item__price">395</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Paneer Lazeez Lababdar</span><span class="item__desc">Spiced tomato, cashew paste, cheese, onion &amp; herbs</span></div><div class="item__price">465</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Malai Kofta</span><span class="item__desc">Khoya, nuts &amp; cottage cheese balls in rich cashew gravy</span></div><div class="item__price">465</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Mix Vegetables Khurchan</span><span class="item__desc">Spicy Indian delicacy, red, yellow &amp; green peppers</span></div><div class="item__price">425</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Kadai Paneer</span><span class="item__desc">Cottage cheese &amp; bell peppers, freshly ground spicy masala</span></div><div class="item__price">465</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Pav Bhaji</span><span class="item__desc">Thick vegetable curry, soft bread roll with chef twist</span></div><div class="item__price">425</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Jeera Aloo</span><span class="item__desc">Potatoes, spices &amp; cumin</span></div><div class="item__price">325</div></div>
+        </div>
+      </div>
+
+      <div class="category" id="meat-main">
+        <h3 class="category__title display">Main Course Meat Lovers</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Bhatti Butter Chicken</span><span class="item__desc">Slow cooked chicken tikka, tomato &amp; cashew gravy</span></div><div class="item__price">425</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Chicken Tikka Masala</span><span class="item__desc">Roasted marinated chicken chunks in spiced sauce</span></div><div class="item__price">445</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Smoked Mutton Roganjosh</span><span class="item__desc">Slow cooked, alkanet flower &amp; Kashmiri chillies</span></div><div class="item__price">545</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Rajasthani Laal Maas</span><span class="item__desc">Mutton curry, yoghurt &amp; hot red Mathania chillies</span></div><div class="item__price">545</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Grilled Fish Fillet</span><span class="item__desc">Riversole fish fillet, khus khus rice, lemon butter sauce &amp; sauteed vegetables</span></div><div class="item__price">595</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Grilled Chicken Steak</span><span class="item__desc">Chicken steak, mashed potatoes, sauteed veg &amp; mushroom sauce</span></div><div class="item__price">495</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Grilled BBQ Chicken</span><span class="item__desc">Grilled chicken in bbq sauce, sauteed veg</span></div><div class="item__price">495</div></div>
+        </div>
+      </div>
+
+      <div class="category" id="chinatown">
+        <h3 class="category__title display">Main Course From China Town</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Exotic Veg Chilli Coriander Sauce</span><span class="item__desc">Asian exotic vegetables tossed in chilli coriander sauce</span></div><div class="item__price">475</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Manchurian</span><span class="item__desc">Veg or chicken deep fried balls in manchurian sauce</span></div><div class="item__price">345 <small>/ 395</small></div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Green Thai Curry</span><span class="item__desc">Veg / Chicken / Prawns — coconut, green chilli, lemongrass</span></div><div class="item__price">445 <small>/ 495 / 545</small></div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Red Thai Curry</span><span class="item__desc">Veg / Chicken / Prawns — red thai paste, lemongrass &amp; ginger</span></div><div class="item__price">445 <small>/ 495 / 545</small></div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Wok Tossed Prawn</span><span class="item__desc">Tempura prawns, garlic, ginger, chinese veg, thai herbs, oyster sauce</span></div><div class="item__price">595</div></div>
+        </div>
+      </div>
+
+      <div class="category" id="sides">
+        <h3 class="category__title display">Side Dishes</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Tandoori Roti</span></div><div class="item__price">85</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Garlic Naan</span></div><div class="item__price">95</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Missi Roti</span></div><div class="item__price">95</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Lachha Pantha / Butter Naan / Plain Naan</span></div><div class="item__price">95</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Steam Rice / Jeera Rice / Peas Pulao</span></div><div class="item__price">245</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Fried Rice</span><span class="item__desc">Veg / Chicken / Prawns</span></div><div class="item__price">265 <small>/ 325 / 345</small></div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Noodles</span><span class="item__desc">Veg / Chicken / Prawns</span></div><div class="item__price">265 <small>/ 325 / 345</small></div></div>
+        </div>
+      </div>
+
+      <div class="category" id="biryani">
+        <h3 class="category__title display">Biryani</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Lucknowi Subz Biryani</span></div><div class="item__price">365</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Awadhi Chicken Biryani</span></div><div class="item__price">465</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Hyderabadi Mutton Biryani</span></div><div class="item__price">525</div></div>
+        </div>
+      </div>
+
+      <div class="category" id="combo">
+        <h3 class="category__title display">Combo Meals</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Veg Combo Meal</span><span class="item__desc">Choice of dal, any 1 veg dish, 2 laccha paratha</span></div><div class="item__price">345</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Chicken Combo Meal</span><span class="item__desc">Choice of dal, any 1 chicken dish, 2 laccha paratha</span></div><div class="item__price">375</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Mutton Combo Meal</span><span class="item__desc">Choice of dal, any 1 mutton dish, 2 laccha paratha</span></div><div class="item__price">445</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Asian Combo Meal</span><span class="item__desc">Veg / Chicken / Seafood</span></div><div class="item__price">345 <small>/ 375 / 445</small></div></div>
+        </div>
+      </div>
+
+      <div class="category" id="dessert">
+        <h3 class="category__title display">Dessert</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Death by Chocolate Sundae</span></div><div class="item__price">345</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Gulab Jamun Stuffed</span></div><div class="item__price">395</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Awadhi Shahi Tukda</span></div><div class="item__price">425</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Fudgy Brownie</span></div><div class="item__price">295</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Fried Ice Cream</span></div><div class="item__price">275</div></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+  <div class="photo-moment" style="background-image:url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1600');">
+    <div class="photo-moment__label">
+      <div class="eyebrow">A Little Meraki</div>
+      <h2 class="display">In Every Pour</h2>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BAR PANEL ===== -->
+<div class="panel" id="panel-bar">
+  <section class="section section--last">
+    <div class="section__head">
+      <div class="eyebrow">Section Two</div>
+      <h2 class="display">Bar Menu</h2>
+      <p>Cocktails, spirits, wine &amp; beer. By the shot, glass, or bottle.</p>
+    </div>
+    <nav class="jumpnav">
+      <a href="#cocktails">Cocktails</a>
+      <a href="#margaritas">Margaritas</a>
+      <a href="#liits">L.I.I.T.s</a>
+      <a href="#mojitos">Mojitos</a>
+      <a href="#gnts">G&amp;T's</a>
+      <a href="#shooters">Shooters</a>
+      <a href="#inhouse">In House</a>
+      <a href="#beer">Beer</a>
+      <a href="#vodka">Vodka</a>
+      <a href="#gin">Gin</a>
+      <a href="#rum">Rum</a>
+      <a href="#tequila">Tequila</a>
+      <a href="#liqueur">Liqueur</a>
+      <a href="#irish">Irish / American</a>
+      <a href="#japanese">Japanese</a>
+      <a href="#blended">Blended Whisky</a>
+      <a href="#singlemalt">Single Malt</a>
+      <a href="#cognac">Cognac &amp; Brandy</a>
+      <a href="#wine">Wine</a>
+      <a href="#sparkling">Sparkling</a>
+      <a href="#sangria">Sangrias</a>
+    </nav>
+    <div class="category-list" style="margin-top:64px;">
+
+      <div class="category" id="cocktails">
+        <h3 class="category__title display">World Classic Cocktails</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Gin Basil Smash</span><span class="item__desc">Gin, basil &amp; fresh lemon juice</span></div><div class="item__price">425</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Southside</span><span class="item__desc">Mint, simple syrup, lime juice &amp; gin</span></div><div class="item__price">425</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Moscow Mule</span><span class="item__desc">Vodka, ginger &amp; lime</span></div><div class="item__price">425</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Bloody Mary</span><span class="item__desc">Vodka, tomato juice, Worcestershire, hot sauce, celery &amp; salted rim</span></div><div class="item__price">425</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Mai-Tai</span><span class="item__desc">Rum, Curaçao liqueur, orgeat syrup &amp; lime juice</span></div><div class="item__price">425</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Missionari Downfall</span><span class="item__desc">White rum, mint, pineapple &amp; peach liqueur</span></div><div class="item__price">425</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Whiskey Sour</span><span class="item__desc">Whiskey, lemon juice, sugar &amp; a dash of egg white</span></div><div class="item__price">445</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Mint Julep</span><span class="item__desc">Bourbon, sugar, water, crushed ice &amp; fresh mint</span></div><div class="item__price">445</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Mexican Mule</span><span class="item__desc">Tequila, lime juice, crushed ice &amp; fresh ginger juice</span></div><div class="item__price">445</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">The Batanga</span><span class="item__desc">Tequila, lime &amp; cola on salt rim glass</span></div><div class="item__price">445</div></div>
+        </div>
+      </div>
+
+      <div class="category" id="margaritas">
+        <h3 class="category__title display">Margaritas</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Classic Margarita</span><span class="item__desc">Tequila, triple sec &amp; lime juice</span></div><div class="item__price">465</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Black Magic Margarita</span><span class="item__desc">Activated charcoal margarita</span></div><div class="item__price">495</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Spiced Cucumber Margarita</span><span class="item__desc">Cucumbers, jalapenos, lime &amp; orange liqueur</span></div><div class="item__price">495</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Paprika Lime Margarita</span><span class="item__desc">Chilli infused tequila, lime juice, orange liqueur &amp; agave syrup</span></div><div class="item__price">495</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Amalgamation of All Margaritas</span><span class="item__desc">Miniature of all margaritas</span></div><div class="item__price">695</div></div>
+        </div>
+      </div>
+
+      <div class="category" id="liits">
+        <h3 class="category__title display">L.I.I.T.s</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Classic LIIT</span><span class="item__desc">Vodka, tequila, light rum, triple sec, gin &amp; cola</span></div><div class="item__price">695</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Hawaiian LIIT</span><span class="item__desc">Vodka, tequila, light rum, triple sec, gin &amp; pineapple juice</span></div><div class="item__price">695</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Beach LIIT</span><span class="item__desc">Vodka, tequila, light rum, triple sec, gin &amp; cranberry juice</span></div><div class="item__price">695</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Energetic LIIT</span><span class="item__desc">Vodka, Jagermeister, light rum, triple sec, gin &amp; Red Bull</span></div><div class="item__price">725</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Tokyo Twist LIIT</span><span class="item__desc">Vodka, tequila, light rum, melon liqueur, gin &amp; soda</span></div><div class="item__price">695</div></div>
+        </div>
+      </div>
+
+      <div class="category" id="mojitos">
+        <h3 class="category__title display">Mojitos</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Classic Mojito</span><span class="item__desc">White rum, sugar, lime juice, soda &amp; mint</span></div><div class="item__price">445</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Coconut Mojito</span><span class="item__desc">Mint, coconut rum, coconut cream &amp; club soda</span></div><div class="item__price">445</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Blueberry Mint Mojito</span><span class="item__desc">Blueberries, mint, white rum, sweet &amp; sour, club soda</span></div><div class="item__price">445</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Jager Mojito</span><span class="item__desc">Mint, white rum, Jagermeister &amp; Red Bull</span></div><div class="item__price">525</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Amalgamation of All Mojitos</span><span class="item__desc">Miniature of all mojitos</span></div><div class="item__price">695</div></div>
+        </div>
+      </div>
+
+      <div class="category" id="gnts">
+        <h3 class="category__title display">G&amp;T's</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Regular G&amp;T</span><span class="item__desc">Gin &amp; tonic over ice</span></div><div class="item__price">495</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Basil Cucumber Elderflower G&amp;T</span><span class="item__desc">Basil, cucumber, elderflower, gin &amp; tonic</span></div><div class="item__price">495</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Blueberry Mint G&amp;T</span><span class="item__desc">Blueberries, fresh mint, gin &amp; tonic</span></div><div class="item__price">495</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Passionfruit &amp; Grapefruit G&amp;T</span><span class="item__desc">Passionfruit, grapefruit, gin &amp; tonic</span></div><div class="item__price">495</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Amalgamation of All G&amp;Ts</span><span class="item__desc">Miniature of all G&amp;Ts</span></div><div class="item__price">695</div></div>
+        </div>
+      </div>
+
+      <div class="category" id="shooters">
+        <h3 class="category__title display">Shooters</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">B52</span><span class="item__desc">Coffee liqueur, Irish cream &amp; orange liqueur</span></div><div class="item__price">445 <small>/ 1775 (5 shots)</small></div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Kamikaze</span><span class="item__desc">Vodka, orange liqueur &amp; lime juice</span></div><div class="item__price">395 <small>/ 1575 (5 shots)</small></div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Jager Bomb</span><span class="item__desc">Jagermeister &amp; Red Bull</span></div><div class="item__price">445 <small>/ 1975 (5 shots)</small></div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Flaming Lamborghini</span><span class="item__desc">Bailey's, coffee liqueur, Sambuca &amp; orange liqueur</span></div><div class="item__price">795</div></div>
+        </div>
+      </div>
+
+      <div class="category" id="inhouse">
+        <h3 class="category__title display">In House Cocktails</h3>
+        <div class="items">
+          <div class="item"><div class="item__main"><span class="item__name">Vision</span><span class="item__desc">White rum, avocado, pineapple juice &amp; sweet n sour</span></div><div class="item__price">495</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">The Crush</span><span class="item__desc">Vodka, lime juice, orange liqueur, elderflower &amp; pineapple juice</span></div><div class="item__price">495</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Empire</span><span class="item__desc">Gin, dragonfruit, rosemary, sweet n sour &amp; egg white option</span></div><div class="item__price">495</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Wonder World</span><span class="item__desc">Vodka, strawberry, sweet n sour &amp; pineapple juice</span></div><div class="item__price">495</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Untold Story</span><span class="item__desc">Whisky, caramel &amp; coffee</span></div><div class="item__price">495</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Walk Through Hell</span><span class="item__desc">Tequila, pepper juice, passionfruit &amp; sweet n sour</span></div><div class="item__price">495</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Next Door</span><span class="item__desc">Dark rum, Bailey's, Kahlua &amp; vanilla ice cream</span></div><div class="item__price">495</div></div>
+        </div>
+      </div>
+
+      <div class="category" id="beer">
+        <h3 class="category__title display">Beer</h3>
+        <div class="items items--single">
+          <div class="item item--spirit">
+            <div class="row1"><span class="item__name">Corona Extra</span><span class="origin">Mexico</span></div>
+            <div class="prices"><span>445<small>Pint</small></span><span>2225<small>6 Pints</small></span></div>
+          </div>
+          <div class="item item--spirit">
+            <div class="row1"><span class="item__name">Hoegaarden</span><span class="origin">Belgium</span></div>
+            <div class="prices"><span>445<small>Pint</small></span><span>2225<small>6 Pints</small></span></div>
+          </div>
+          <div class="item item--spirit">
+            <div class="row1"><span class="item__name">Heineken</span><span class="origin">Netherlands</span></div>
+            <div class="prices"><span>375<small>Pint</small></span><span>1875<small>6 Pints</small></span></div>
+          </div>
+          <div class="item item--spirit">
+            <div class="row1"><span class="item__name">Kingfisher Ultra</span><span class="origin">India</span></div>
+            <div class="prices"><span>375<small>Pint</small></span><span>1875<small>6 Pints</small></span></div>
+          </div>
+          <div class="item item--spirit">
+            <div class="row1"><span class="item__name">Budweiser Premium</span><span class="origin">USA</span></div>
+            <div class="prices"><span>375<small>Pint</small></span><span>1875<small>6 Pints</small></span></div>
+          </div>
+          <div class="item item--spirit">
+            <div class="row1"><span class="item__name">Bira White</span><span class="origin">India</span></div>
+            <div class="prices"><span>345<small>Pint</small></span><span>1725<small>6 Pints</small></span></div>
+          </div>
+          <div class="item item--spirit">
+            <div class="row1"><span class="item__name">Breezer</span><span class="origin">Jamaica</span></div>
+            <div class="prices"><span>345<small>Pint</small></span><span>1725<small>6 Pints</small></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="category" id="vodka">
+        <h3 class="category__title display">Vodka</h3>
+        <div class="items items--single">
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Roberto Cavalli</span><span class="origin">Italy</span></div><div class="prices"><span>595<small>30 ml</small></span><span>2975<small>180 ml</small></span><span>11895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Belvedere</span><span class="origin">Poland</span></div><div class="prices"><span>445<small>30 ml</small></span><span>2225<small>180 ml</small></span><span>8895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Ciroc</span><span class="origin">France</span></div><div class="prices"><span>425<small>30 ml</small></span><span>2125<small>180 ml</small></span><span>8495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Grey Goose</span><span class="origin">France</span></div><div class="prices"><span>395<small>30 ml</small></span><span>1975<small>180 ml</small></span><span>7895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Ketel One</span><span class="origin">Netherlands</span></div><div class="prices"><span>295<small>30 ml</small></span><span>1475<small>180 ml</small></span><span>5895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Absolut</span><span class="origin">Sweden</span></div><div class="prices"><span>245<small>30 ml</small></span><span>1225<small>180 ml</small></span><span>4895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Absolut Flavour</span><span class="origin">Sweden</span></div><div class="prices"><span>265<small>30 ml</small></span><span>1325<small>180 ml</small></span><span>5295<small>Bottle</small></span></div></div>
+        </div>
+      </div>
+
+      <div class="category" id="gin">
+        <h3 class="category__title display">Gin</h3>
+        <div class="items items--single">
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Monkey 47 Schwarzwald Dry Gin</span><span class="origin">Germany</span></div><div class="prices"><span>595<small>30 ml</small></span><span>2975<small>180 ml</small></span><span>11895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Roku Gin</span><span class="origin">Japan</span></div><div class="prices"><span>475<small>30 ml</small></span><span>2375<small>180 ml</small></span><span>9494<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Hendrick's Gin</span><span class="origin">Scotland</span></div><div class="prices"><span>445<small>30 ml</small></span><span>2225<small>180 ml</small></span><span>8895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Bombay Sapphire</span><span class="origin">England</span></div><div class="prices"><span>265<small>30 ml</small></span><span>1325<small>180 ml</small></span><span>5295<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Tanqueray Imported</span><span class="origin">England</span></div><div class="prices"><span>225<small>30 ml</small></span><span>1125<small>180 ml</small></span><span>4495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Jaisalmer Indian Craft Gin</span><span class="origin">India</span></div><div class="prices"><span>695<small>30 ml</small></span><span>3475<small>180 ml</small></span><span>13895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Jamun Himalayan Juniper Dry Gin</span><span class="origin">India</span></div><div class="prices"><span>375<small>30 ml</small></span><span>1875<small>180 ml</small></span><span>7495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Jodhpur Gin</span><span class="origin">India</span></div><div class="prices"><span>495<small>30 ml</small></span><span>2475<small>180 ml</small></span><span>9895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Beefeater</span><span class="origin">UK</span></div><div class="prices"><span>225<small>30 ml</small></span><span>1125<small>180 ml</small></span><span>4495<small>Bottle</small></span></div></div>
+        </div>
+      </div>
+
+      <div class="category" id="rum">
+        <h3 class="category__title display">Rum</h3>
+        <div class="items items--single">
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Bacardi Ocho</span><span class="origin">Cuba</span></div><div class="prices"><span>375<small>30 ml</small></span><span>1875<small>180 ml</small></span><span>7495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Bacardi Carta Blanca / Black</span><span class="origin">Cuba</span></div><div class="prices"><span>195<small>30 ml</small></span><span>975<small>180 ml</small></span><span>3895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Old Monk</span><span class="origin">India</span></div><div class="prices"><span>195<small>30 ml</small></span><span>975<small>180 ml</small></span><span>3895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Captain Morgan</span><span class="origin">Jamaica</span></div><div class="prices"><span>195<small>30 ml</small></span><span>975<small>180 ml</small></span><span>3895<small>Bottle</small></span></div></div>
+        </div>
+      </div>
+
+      <div class="category" id="tequila">
+        <h3 class="category__title display">Tequila</h3>
+        <div class="items items--single">
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Jose Cuervo Silver</span><span class="origin">Mexico</span></div><div class="prices"><span>365<small>30 ml</small></span><span>7995<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Tequila Gold</span><span class="origin">Mexico</span></div><div class="prices"><span>365<small>30 ml</small></span><span>7995<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Tequila Silver</span><span class="origin">Mexico</span></div><div class="prices"><span>345<small>30 ml</small></span><span>7495<small>Bottle</small></span></div></div>
+        </div>
+      </div>
+
+      <div class="category" id="liqueur">
+        <h3 class="category__title display">Liqueur</h3>
+        <div class="items items--single">
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Jagermeister</span><span class="origin">Germany</span></div><div class="prices"><span>395<small>30 ml</small></span><span>7895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Jack Daniel's Fire</span><span class="origin">America</span></div><div class="prices"><span>375<small>30 ml</small></span><span>7495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Jack Daniel's Honey</span><span class="origin">America</span></div><div class="prices"><span>375<small>30 ml</small></span><span>7495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Campari</span><span class="origin">Italy</span></div><div class="prices"><span>325<small>30 ml</small></span><span>6495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Bailey's</span><span class="origin">Ireland</span></div><div class="prices"><span>325<small>30 ml</small></span><span>6495<small>Bottle</small></span></div></div>
+        </div>
+      </div>
+
+      <div class="category" id="irish">
+        <h3 class="category__title display">Irish &amp; American Whisky</h3>
+        <div class="items items--single">
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Gentleman Jack Double Mellowed</span><span class="origin">America</span></div><div class="prices"><span>475<small>30 ml</small></span><span>2375<small>180 ml</small></span><span>9495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Jack Daniel's No. 7</span><span class="origin">America</span></div><div class="prices"><span>345<small>30 ml</small></span><span>1725<small>180 ml</small></span><span>6895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Jameson</span><span class="origin">Ireland</span></div><div class="prices"><span>275<small>30 ml</small></span><span>1375<small>180 ml</small></span><span>5495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Jim Beam Kentucky</span><span class="origin">America</span></div><div class="prices"><span>225<small>30 ml</small></span><span>1125<small>180 ml</small></span><span>4495<small>Bottle</small></span></div></div>
+        </div>
+      </div>
+
+      <div class="category" id="japanese">
+        <h3 class="category__title display">Japanese Whiskey</h3>
+        <div class="items items--single">
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Yamazaki</span><span class="origin">Japan</span></div><div class="prices"><span>1195<small>30 ml</small></span><span>5975<small>180 ml</small></span><span>23895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Hibiki</span><span class="origin">Japan</span></div><div class="prices"><span>1195<small>30 ml</small></span><span>5975<small>180 ml</small></span><span>23895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Suntory Toki</span><span class="origin">Japan</span></div><div class="prices"><span>475<small>30 ml</small></span><span>2375<small>180 ml</small></span><span>9495<small>Bottle</small></span></div></div>
+        </div>
+      </div>
+
+      <div class="category" id="blended">
+        <h3 class="category__title display">Blended Whisky</h3>
+        <div class="items items--single">
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Royal Salute 21 Yrs</span><span class="origin">Scotland</span></div><div class="prices"><span>1295<small>30 ml</small></span><span>6475<small>180 ml</small></span><span>25895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Chivas 18 Yrs</span><span class="origin">Scotland</span></div><div class="prices"><span>695<small>30 ml</small></span><span>3475<small>180 ml</small></span><span>13895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Monkey Shoulder</span><span class="origin">Scotland</span></div><div class="prices"><span>425<small>30 ml</small></span><span>2125<small>180 ml</small></span><span>8495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">JW Blue Label</span><span class="origin">Scotland</span></div><div class="prices"><span>1295<small>30 ml</small></span><span>6475<small>180 ml</small></span><span>25895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">JW Gold Label</span><span class="origin">Scotland</span></div><div class="prices"><span>545<small>30 ml</small></span><span>2725<small>180 ml</small></span><span>10895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">JW Double Black</span><span class="origin">Scotland</span></div><div class="prices"><span>425<small>30 ml</small></span><span>2125<small>180 ml</small></span><span>8495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">JW Black Label</span><span class="origin">Scotland</span></div><div class="prices"><span>365<small>30 ml</small></span><span>1825<small>180 ml</small></span><span>7295<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">JW Blonde</span><span class="origin">Scotland</span></div><div class="prices"><span>295<small>30 ml</small></span><span>1475<small>180 ml</small></span><span>5895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">JW Red Label</span><span class="origin">Scotland</span></div><div class="prices"><span>245<small>30 ml</small></span><span>1225<small>180 ml</small></span><span>4895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Chivas 12 Yrs</span><span class="origin">Scotland</span></div><div class="prices"><span>365<small>30 ml</small></span><span>1825<small>180 ml</small></span><span>7295<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Dewar's Bourbon Casks 12 Yrs</span><span class="origin">Scotland</span></div><div class="prices"><span>375<small>30 ml</small></span><span>1875<small>180 ml</small></span><span>7495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Teacher's Golden Thistle</span><span class="origin">Scotland</span></div><div class="prices"><span>315<small>30 ml</small></span><span>1575<small>180 ml</small></span><span>6295<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Teacher's 50</span><span class="origin">Scotland</span></div><div class="prices"><span>295<small>30 ml</small></span><span>1475<small>180 ml</small></span><span>6295<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Teacher's Highland Reserve</span><span class="origin">Scotland</span></div><div class="prices"><span>245<small>30 ml</small></span><span>1225<small>180 ml</small></span><span>4895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">100 Piper's Blended Malt 8 Yrs</span><span class="origin">Scotland</span></div><div class="prices"><span>245<small>30 ml</small></span><span>1225<small>180 ml</small></span><span>4895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Black Dog Triple Gold Reserve</span><span class="origin">Scotland</span></div><div class="prices"><span>315<small>30 ml</small></span><span>1575<small>180 ml</small></span><span>6295<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Ballantines Finest</span><span class="origin">Scotland</span></div><div class="prices"><span>245<small>30 ml</small></span><span>1225<small>180 ml</small></span><span>4895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Black &amp; White 8 Yrs</span><span class="origin">Scotland</span></div><div class="prices"><span>245<small>30 ml</small></span><span>1225<small>180 ml</small></span><span>4895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Black &amp; White</span><span class="origin">Scotland</span></div><div class="prices"><span>215<small>30 ml</small></span><span>1075<small>180 ml</small></span><span>4295<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Dewar's White Label</span><span class="origin">Scotland</span></div><div class="prices"><span>215<small>30 ml</small></span><span>1075<small>180 ml</small></span><span>4295<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Teacher's Highland Cream</span><span class="origin">Scotland</span></div><div class="prices"><span>215<small>30 ml</small></span><span>1075<small>180 ml</small></span><span>4295<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Black Dog Black Reserve</span><span class="origin">Scotland</span></div><div class="prices"><span>215<small>30 ml</small></span><span>1075<small>180 ml</small></span><span>4295<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">100 Piper's Exceptional</span><span class="origin">Scotland</span></div><div class="prices"><span>215<small>30 ml</small></span><span>1075<small>180 ml</small></span><span>4295<small>Bottle</small></span></div></div>
+        </div>
+      </div>
+
+      <div class="category" id="singlemalt">
+        <h3 class="category__title display">Single Malt</h3>
+        <div class="items items--single">
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Glenfiddich 18 Y.O.</span><span class="origin">Speyside</span></div><div class="prices"><span>945<small>30 ml</small></span><span>4725<small>180 ml</small></span><span>18895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">The Glenlivet 18 Yrs</span><span class="origin">Speyside</span></div><div class="prices"><span>845<small>30 ml</small></span><span>4225<small>180 ml</small></span><span>16895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">The Macallan 12 Y.O.</span><span class="origin">Speyside</span></div><div class="prices"><span>725<small>30 ml</small></span><span>3625<small>180 ml</small></span><span>14495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">The Dalmore 12 Y.O.</span><span class="origin">Highland</span></div><div class="prices"><span>845<small>30 ml</small></span><span>4225<small>180 ml</small></span><span>16895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Dalwhinnie 12 Y.O.</span><span class="origin">Highland</span></div><div class="prices"><span>595<small>30 ml</small></span><span>2975<small>180 ml</small></span><span>11895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Laphroaig 12 Y.O.</span><span class="origin">Islay</span></div><div class="prices"><span>495<small>30 ml</small></span><span>2475<small>180 ml</small></span><span>9895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Glenkinchie 12 Y.O.</span><span class="origin">Lowland</span></div><div class="prices"><span>595<small>30 ml</small></span><span>2975<small>180 ml</small></span><span>11895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Bushmills 12 Y.O.</span><span class="origin">Ireland</span></div><div class="prices"><span>475<small>30 ml</small></span><span>2375<small>180 ml</small></span><span>9495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Talisker 10 Y.O.</span><span class="origin">Islay</span></div><div class="prices"><span>695<small>30 ml</small></span><span>3475<small>180 ml</small></span><span>13895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Glenfiddich 12 Y.O.</span><span class="origin">Speyside</span></div><div class="prices"><span>525<small>30 ml</small></span><span>2625<small>180 ml</small></span><span>10495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Glenmorangie Original 10 Y.O.</span><span class="origin">Highland</span></div><div class="prices"><span>525<small>30 ml</small></span><span>2625<small>180 ml</small></span><span>10495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Bowmore 12 Y.O.</span><span class="origin">Islay</span></div><div class="prices"><span>475<small>30 ml</small></span><span>2375<small>180 ml</small></span><span>9495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">The Ardmore 12 Y.O.</span><span class="origin">Highland</span></div><div class="prices"><span>425<small>30 ml</small></span><span>2125<small>180 ml</small></span><span>8495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">The Glenlivet 12 Y.O.</span><span class="origin">Speyside</span></div><div class="prices"><span>395<small>30 ml</small></span><span>1975<small>180 ml</small></span><span>7895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Indri</span><span class="origin">India</span></div><div class="prices"><span>495<small>30 ml</small></span><span>2475<small>180 ml</small></span><span>9895<small>Bottle</small></span></div></div>
+        </div>
+      </div>
+
+      <div class="category" id="cognac">
+        <h3 class="category__title display">Cognac &amp; Brandy</h3>
+        <div class="items items--single">
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Hennessy V.S</span><span class="origin">France</span></div><div class="prices"><span>575<small>30 ml</small></span><span>2875<small>180 ml</small></span><span>11495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Martell VSOP</span><span class="origin">France</span></div><div class="prices"><span>545<small>30 ml</small></span><span>2725<small>180 ml</small></span><span>10895<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Martell VS</span><span class="origin">France</span></div><div class="prices"><span>425<small>30 ml</small></span><span>2125<small>180 ml</small></span><span>8495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Morpheus XO</span><span class="origin">India</span></div><div class="prices"><span>225<small>30 ml</small></span><span>1125<small>180 ml</small></span><span>4495<small>Bottle</small></span></div></div>
+        </div>
+      </div>
+
+      <div class="category" id="wine">
+        <h3 class="category__title display">Wine</h3>
+        <div class="items items--single">
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Fantini Montepuciano D'Abruzzo</span><span class="origin">Italy — Red</span></div><div class="prices"><span>4495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Vina Tarapaca Cabernet Sauvignon</span><span class="origin">Chile — Red</span></div><div class="prices"><span>2945<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Campo Viejo Rioja Tempranillo</span><span class="origin">Spain — Red</span></div><div class="prices"><span>2945<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Jacob's Creek Shiraz Cabernet</span><span class="origin">Australia — Red</span></div><div class="prices"><span>595<small>Glass</small></span><span>2945<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Sula Shiraz Cabernet</span><span class="origin">India — Red</span></div><div class="prices"><span>495<small>Glass</small></span><span>2445<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Fratelli Cabernet Sauvignon</span><span class="origin">India — Red</span></div><div class="prices"><span>2445<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Rasa Syrah</span><span class="origin">India — Red</span></div><div class="prices"><span>2445<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Dindori Reserve Shiraz</span><span class="origin">India — Red</span></div><div class="prices"><span>2445<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Vina Tarapaca Chardonnay</span><span class="origin">Chile — White</span></div><div class="prices"><span>3495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Campo Viejo Tempranillo Blanco</span><span class="origin">Spain — White</span></div><div class="prices"><span>2945<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Jacob's Creek Classic Chardonnay</span><span class="origin">Australia — White</span></div><div class="prices"><span>595<small>Glass</small></span><span>2945<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Sula Sauvignon Blanc</span><span class="origin">India — White</span></div><div class="prices"><span>495<small>Glass</small></span><span>2445<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Fratelli Chenin Blanc</span><span class="origin">India — White</span></div><div class="prices"><span>2445<small>Bottle</small></span></div></div>
+        </div>
+      </div>
+
+      <div class="category" id="sparkling">
+        <h3 class="category__title display">Champagne &amp; Sparkling</h3>
+        <div class="items items--single">
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Moet &amp; Chandon Brut</span><span class="origin">France</span></div><div class="prices"><span>12995<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Chandon Brut</span><span class="origin">France</span></div><div class="prices"><span>4995<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Martini Prosecco</span><span class="origin">Italy</span></div><div class="prices"><span>3295<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Noi Sparkling</span><span class="origin">India</span></div><div class="prices"><span>3495<small>Bottle</small></span></div></div>
+          <div class="item item--spirit"><div class="row1"><span class="item__name">Sula Seco Methode Classique</span><span class="origin">India</span></div><div class="prices"><span>2995<small>Bottle</small></span></div></div>
+        </div>
+      </div>
+
+      <div class="category" id="sangria">
+        <h3 class="category__title display">Sangrias</h3>
+        <div class="items items--single">
+          <div class="item"><div class="item__main"><span class="item__name">Red / White Wine Sangria</span><span class="item__desc">Wine, chopped fruit &amp; spirits</span></div><div class="item__price">595</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Red / White Spanish Sangria</span><span class="item__desc">Wine, chopped fruit, spirits &amp; soda</span></div><div class="item__price">595</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Red / White Sangria Pitcher</span><span class="item__desc">Serves 3 glasses</span></div><div class="item__price">1695</div></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<!-- ===== DRINKS PANEL ===== -->
+<div class="panel" id="panel-drinks">
+  <section class="section section--last">
+    <div class="section__head">
+      <div class="eyebrow">Section Three</div>
+      <h2 class="display">Mocktails &amp; Beverages</h2>
+      <p>Lickables, mocktails and everyday sips.</p>
+    </div>
+    <div class="category-list">
+
+      <div class="category">
+        <h3 class="category__title display">Lickables</h3>
+        <div class="items items--single">
+          <div class="item"><div class="item__main"><span class="item__name">Kit-Kat Chocolaty</span><span class="item__desc">Thick blend of Kit-Kat &amp; ice cream, garnished in meraki way</span></div><div class="item__price">395</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Caramel Blast</span><span class="item__desc">Caramel, Parle-G &amp; ice cream, garnished in meraki way</span></div><div class="item__price">395</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Oreo &amp; Brownie</span><span class="item__desc">Oreo, brownie &amp; ice cream, garnished in meraki way</span></div><div class="item__price">395</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">The Wish Jar</span><span class="item__desc">Coconut, dry fruits &amp; ice cream, garnished in meraki way</span></div><div class="item__price">395</div></div>
+        </div>
+      </div>
+
+      <div class="category">
+        <h3 class="category__title display">Mocktails</h3>
+        <div class="items items--single">
+          <div class="item"><div class="item__main"><span class="item__name">Float Cola</span><span class="item__desc">Traditional way of serving Coca-Cola with ice cream</span></div><div class="item__price">295</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Magic Move</span><span class="item__desc">Grapefruit, orange juice, cranberry juice, sweet n sour &amp; soda</span></div><div class="item__price">295</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Meraki Lemonade</span><span class="item__desc">Blueberries, rosemary, sweet n sour &amp; soda</span></div><div class="item__price">295</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Pina Colada</span><span class="item__desc">Pineapple juice, coconut cream &amp; ice cream</span></div><div class="item__price">295</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">The Ferry</span><span class="item__desc">Grapefruit, cranberry juice, kaffir lime &amp; soda</span></div><div class="item__price">295</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Orange Basil Smash</span><span class="item__desc">Fresh orange, basil, sweet n sour &amp; sprite</span></div><div class="item__price">295</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Fruit Punch</span><span class="item__desc">Pineapple juice, orange juice, apple juice, sweetener &amp; ice cream</span></div><div class="item__price">295</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Iced Teas</span><span class="item__desc">Peach / Lemon / Hibiscus</span></div><div class="item__price">295</div></div>
+        </div>
+      </div>
+
+      <div class="category">
+        <h3 class="category__title display">Beverages</h3>
+        <div class="items items--single">
+          <div class="item"><div class="item__main"><span class="item__name">Bottle Water</span></div><div class="item__price">MRP</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Red Bull</span></div><div class="item__price">295</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Coke / Diet Coke / Sprite</span></div><div class="item__price">145</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Soda Can</span></div><div class="item__price">75</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Ginger Ale Can</span></div><div class="item__price">125</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Tonic Water Can</span></div><div class="item__price">125</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Fresh Lime Water / Soda</span></div><div class="item__price">125</div></div>
+          <div class="item"><div class="item__main"><span class="item__name">Canned Juice</span></div><div class="item__price">125</div></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="footer-grid">
+    <div>
+      <h4>Meraki the Bistro</h4>
+      <p>301, 3rd Floor, Millennium Palace,<br>Golf City, Sector B Ansal API, Lucknow</p>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <a href="tel:+919151006550">+91 91510 06550</a>
+      <a href="mailto:merakibistro@gmail.com">merakibistro@gmail.com</a>
+    </div>
+    <div>
+      <h4>Hours</h4>
+      <p>Mon – Sun<br>12:00 PM – 1:00 AM</p>
+    </div>
+  </div>
+  <div class="footer-wordmark">Meraki<span class="mark">✶</span></div>
+  <div class="footer-note">© 2026 Meraki The Bistro. All rights reserved.</div>
+</footer>
+
+<div class="legal-note">
+  A 10% service charge applies. Govt. taxes as applicable. Standard serving quantity is 30 ml.
+  Please inform our team of any allergies before ordering.
+  <div class="keys">
+    <span><span class="dot dot--veg"></span> Veg</span>
+    <span><span class="dot dot--nonveg"></span> Non-Veg</span>
+  </div>
+</div>
+
+<script>
+  const tabs = document.querySelectorAll('.tab');
+  const panels = {
+    food: document.getElementById('panel-food'),
+    bar: document.getElementById('panel-bar'),
+    drinks: document.getElementById('panel-drinks')
+  };
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      Object.values(panels).forEach(p => p.classList.remove('active'));
+      panels[tab.dataset.tab].classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+</script>
+</body>
+</html>
